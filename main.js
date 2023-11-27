@@ -53,8 +53,14 @@ cardArray.sort(() => 0.5 - Math.random())
 
 const gridDOM = document.querySelector('#grid')
 
-const initDOM = () => {
+let cardsDOM = null
+let matchedCards = 0
+let cardsFoundId = []
+let cardsChosen = []
+
+const initGame = () => {
   gridDOM.innerHTML = ''
+
   cardArray.forEach((card, index) => {
 
     const cardDOM = document.createElement('div')
@@ -63,17 +69,14 @@ const initDOM = () => {
     const cardBackDOM = document.createElement('div')
     const imgBackDOM = document.createElement('img')
 
-
-    cardFrontDOM.classList.add('card-front')
-    cardBackDOM.classList.add('card-back')
     cardDOM.classList.add('card')
     cardDOM.dataset.id = index
 
+    cardFrontDOM.classList.add('card-front')
     imgFrontDOM.src = card.img
-    imgBackDOM.src = 'img/blank.png'
 
-    cardDOM.appendChild(cardFrontDOM)
-    cardDOM.appendChild(cardBackDOM)
+    cardBackDOM.classList.add('card-back')
+    imgBackDOM.src = 'img/blank.png'
 
     cardFrontDOM.appendChild(imgFrontDOM)
     cardBackDOM.appendChild(imgBackDOM)
@@ -83,55 +86,51 @@ const initDOM = () => {
 
     gridDOM.appendChild(cardDOM)
   })
+
+  cardsDOM = document.querySelectorAll('.card')
 }
 
-initDOM();
+function initListeners() {
+  cardsDOM.forEach(card => {
+    card.addEventListener('click', () => {
+      card.classList.add('flipped')
 
-const cardsDOM = document.querySelectorAll('.card')
+      let cardId = card.dataset.id;
 
-let matchedCards = 0
-let cardsFoundId = []
-let cardsChosen = []
+      if (cardsChosen.some(cardChosen => cardChosen === cardId)) return
+      if (cardsFoundId.some(cardFoundId => cardFoundId === cardId)) return
 
-cardsDOM.forEach(card => {
-  card.addEventListener('click', () => {
-    card.classList.add('flipped')
+      cardsChosen.push(cardId)
 
-    let cardId = card.dataset.id;
+      if (cardsChosen.length < 2) return
 
-    if (cardsChosen.some(cardChosen => cardChosen === cardId)) return
-    if (cardsFoundId.some(cardFoundId => cardFoundId === cardId)) return
+      if (!checkForMatch()) {
+        setTimeout(() => {
+          cardsDOM.forEach(cardDOM => {
+            if (cardsFoundId.some(cardFound => cardDOM.dataset.id === cardFound)) return
 
-    cardsChosen.push(cardId)
+            cardDOM.classList.remove('flipped')
+          })
+        }, 500)
+        cardsChosen = []
+        return
+      }
 
-    if (cardsChosen.length < 2) return
+      matchedCards++
+      cardsFoundId.push(...cardsChosen)
 
-    if (!checkForMatch()) {
-      setTimeout(() => {
-        cardsDOM.forEach(cardDOM => {
-          if (cardsFoundId.some(cardFound => cardDOM.dataset.id === cardFound)) return
+      if (matchedCards === cardsDOM.length / 2) {
+        setTimeout(() => {
+          document.querySelector('p').textContent = 'You found them all!'
+          document.querySelector('p').classList.add('success')
+          document.querySelector('#reset').disabled = false
+        }, 550)
+      }
 
-          cardDOM.classList.remove('flipped')
-        })
-      }, 500)
       cardsChosen = []
-      return
-    }
-
-    matchedCards++
-    cardsFoundId.push(...cardsChosen)
-
-    if (matchedCards === cardsDOM.length / 2) {
-      setTimeout(() => {
-        document.querySelector('p').textContent = 'You found them all!'
-        document.querySelector('p').classList.add('success')
-        document.querySelector('#reset').disabled = false
-      }, 550)
-    }
-
-    cardsChosen = []
+    })
   })
-})
+}
 
 const checkForMatch = () => {
   const cardOne = cardArray[cardsChosen[0]].name
@@ -145,7 +144,14 @@ document.querySelector('#reset').addEventListener('click', () => {
   matchedCards = 0
   cardsFoundId = []
   cardsChosen = []
-  initDOM()
+  cardArray.sort(() => 0.5 - Math.random())
+
+  initGame()
+  initListeners()
+
   document.querySelector('p').classList.remove('success')
   document.querySelector('p').textContent = 'Have fun!'
 })
+
+initGame();
+initListeners();
