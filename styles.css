@@ -1,0 +1,85 @@
+html {
+  color-scheme: dark light;
+  font-family: Poppins;
+}
+
+body {
+  position: relative;
+  min-height: 100dvh;
+  display: grid;
+  margin: 0;
+  place-content: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+#grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  place-items: center;
+  gap: 1.2rem;
+}
+
+.card {
+  cursor: pointer;
+  position: relative;
+  transform: rotateY(0deg);
+  transform-style: preserve-3d;
+  transition: transform .5s;
+  z-index: 2;
+
+  &>div {
+    border-radius: 1rem;
+    overflow: hidden;
+  }
+}
+
+.card-front {
+  display: flex;
+  width: 100px;
+  aspect-ratio: 1;
+  z-index: 0;
+
+  &>img {
+    aspect-ratio: 3 / 5;
+    width: 100%;
+    object-fit: cover;
+  }
+}
+
+.card-back {
+  position: absolute;
+  top: 0;
+  display: flex;
+  backface-visibility: hidden;
+}
+
+.flipped {
+  transform: rotateY(180deg);
+}
+
+p{
+  font-size: 1.25rem;
+}
+
+.success {
+  background-color: green;
+  padding: 2px 10px;
+  border-radius: 10px;
+  transition: all .5s;
+}
+
+#reset{
+  position: absolute;
+  border: none;
+  font-family: Poppins;
+  font-size: 1.2rem;
+  background-color: rgb(71, 179, 184);
+  padding: 10px;
+  border-radius: 10px;
+  width: 100px;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: pointer;
+}
